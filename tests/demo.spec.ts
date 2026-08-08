@@ -2,6 +2,7 @@ import { test, expect } from '#framework/ui/fixtures/browser.fixture.js';
 import MainPage from './pages/MainPage.js';
 import LoginPage from './pages/LoginPage.js';
 import SecureAreaPage from './pages/SecureAreaPage.js';
+import AddRemovePage from './pages/AddRemovePage.js';
 import ConfigReader from '#framework/utils/ConfigReader.js';
 import EnvProvider from '#framework/utils/EnvProvider.js';
 
@@ -26,4 +27,20 @@ test('demo test for a successful login', async ({ customBrowser: browser }) => {
   await secureAreaPage.clickLogoutButton();
   await loginPage.waitForPageToLoad();
   expect(await loginPage.isPageOpened()).toBe(true);
+});
+
+test('test for add/remove elements', async ({ customBrowser: browser }) => {
+  const testData = ConfigReader.getTestData();
+  const mainPage = new MainPage(browser.page);
+  await mainPage.clickNavigationLink('Add/Remove Elements');
+
+  const addRemovePage = new AddRemovePage(browser.page);
+  await addRemovePage.waitForPageToLoad();
+  expect(await addRemovePage.isPageOpened()).toBe(true);
+  await addRemovePage.clickButton('Add Element');
+  expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(true);
+  await addRemovePage.clickButton('Delete');
+  expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(false);
+  await addRemovePage.insertHtmlById('#elements', '<button class="added-manually" onclick="deleteElement()">Delete</button>');
+  expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(true);
 });

@@ -58,4 +58,20 @@ export default class BaseElement {
       await this.locator.waitFor({ state: 'visible', timeout });
     });
   }
+
+  /**
+   * Injects HTML into the element using insertAdjacentHTML, encapsulated within a reporting step.
+   * @param position - Where to insert: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend'
+   * @param html - HTML string to inject
+   */
+  async insertHTML(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', html: string): Promise<void> {
+    await test.step(`${this._type} '${this._name}' — Insert HTML: ${position}`, async () => {
+      await this.locator.evaluate(
+      (element, args) => {
+          (element as any).insertAdjacentHTML(args.position, args.html);
+      },
+      { html, position }
+      );
+    });
+  }
 }
