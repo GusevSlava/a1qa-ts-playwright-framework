@@ -1,14 +1,17 @@
-import { test } from '@playwright/test';
+import { test, Page } from '@playwright/test';
 import Timeouts from '../constants/Timeouts.js';
 import BaseElement from '../elements/BaseElement.js';
 
 export default class BasePage {
+  protected uniqueElement: BaseElement;
+  protected _name: string;
+
   /**
    * Initializes a BasePage with a unique element to identify it and a name for reporting.
-   * @param {BaseElement} uniqueElement - A unique element that identifies the page
-   * @param {string} name - Name of the page for logging/reporting
+   * @param uniqueElement - A unique element that identifies the page
+   * @param name - Name of the page for logging/reporting
    */
-  constructor(uniqueElement, name) {
+  constructor(uniqueElement: BaseElement, name: string) {
     if (!(uniqueElement instanceof BaseElement)) {
       throw new Error('uniqueElement must be a child of BaseElement');
     }
@@ -18,18 +21,16 @@ export default class BasePage {
 
   /**
    * Gets the name of the page.
-   * @returns {string}
    */
-  get name() {
+  get name(): string {
     return this._name;
   }
 
   /**
    * Waits for the page to load by waiting for its unique element to be displayed, encapsulated within a reporting step.
-   * @param {number} timeout
-   * @returns {Promise<void>}
+   * @param timeout - Timeout in milliseconds
    */
-  async waitForPageToLoad(timeout = Timeouts.WAIT_PAGE_LOAD) {
+  async waitForPageToLoad(timeout: number = Timeouts.WAIT_PAGE_LOAD): Promise<void> {
     await test.step(`Page '${this._name}' — Wait to load`, async () => {
       await this.uniqueElement.waitForDisplayed(timeout);
     });
@@ -37,9 +38,8 @@ export default class BasePage {
 
   /**
    * Checks if the page is opened using a fast non-blocking visibility check, encapsulated within a reporting step.
-   * @returns {Promise<boolean>}
    */
-  async isPageOpened() {
+  async isPageOpened(): Promise<boolean> {
     return await test.step(`Page '${this._name}' — Check if opened`, async () => {
       return await this.uniqueElement.state.isVisible();
     });

@@ -10,10 +10,9 @@ export default class FileUtils {
    * @example
    * await expect.poll(async () => await FileUtils.isFileExists(filePath)).toBeTruthy();
    *
-   * @param {string} filePath - Absolute path to the file.
-   * @returns {Promise<boolean>}
+   * @param filePath - Absolute path to the file.
    */
-  static async isFileExists(filePath) {
+  static async isFileExists(filePath: string): Promise<boolean> {
     return await test.step(`File Utils — Check if file exists: "${filePath}"`, async () => {
       try {
         await fs.access(filePath);
@@ -26,10 +25,9 @@ export default class FileUtils {
 
   /**
    * Safely creates a directory if it does not exist, encapsulated within a reporting step.
-   * @param {string} dirPath - Path to the directory.
-   * @returns {Promise<void>}
+   * @param dirPath - Path to the directory.
    */
-  static async ensureDirectoryExists(dirPath) {
+  static async ensureDirectoryExists(dirPath: string): Promise<void> {
     await test.step(`File Utils — Ensure directory exists: "${dirPath}"`, async () => {
       try {
         await fs.access(dirPath);

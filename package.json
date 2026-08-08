@@ -1,5 +1,5 @@
 {
-  "name": "a1qa-js-playwright-framework",
+  "name": "a1qa-ts-playwright-framework",
   "version": "1.0.0",
   "description": "UI Test Automation Framework using Playwright",
   "author": "a1qa",
@@ -18,8 +18,11 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.57.0",
     "@types/node": "^24.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.20.0",
+    "@typescript-eslint/parser": "^8.20.0",
     "eslint": "^10.4.1",
-    "eslint-plugin-playwright": "^2.10.4"
+    "eslint-plugin-playwright": "^2.10.4",
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "dotenv": "^17.4.2"

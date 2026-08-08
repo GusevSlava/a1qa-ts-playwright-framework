@@ -1,20 +1,26 @@
 import path from 'path';
-import { test } from '@playwright/test';
+import { test, Page, Dialog } from '@playwright/test';
 
 export default class Browser {
+  private _page: Page;
+  private _pages: Page[];
+  private _downloadDir: string;
+
   /**
    * Initializes the Browser wrapper and tracks open tabs.
-   * @param {import('@playwright/test').Page} page
-   * @param {string} downloadDir - Isolated directory for downloads
+   * @param page - Playwright Page instance
+   * @param downloadDir - Isolated directory for downloads
    */
-  constructor(page, downloadDir) {
+  constructor(page: Page, downloadDir: string) {
     this._page = page;
     this._pages = [page];
-    this._page.on('close', () => { this._pages = this._pages.filter(p => p !== this._page); });
+    this._page.on('close', () => {
+      this._pages = this._pages.filter(p => p !== this._page);
+    });
     this._downloadDir = downloadDir;
 
     // Subscribe to the 'page' event to track newly opened tabs
-    page.context().on('page', (newPage) => {
+    page.context().on('page', (newPage: Page) => {
       if (!this._pages.includes(newPage)) {
         this._pages.push(newPage);
       }
@@ -28,18 +34,15 @@ export default class Browser {
 
   /**
    * Gets the currently active Playwright Page instance.
-   * @returns {import('@playwright/test').Page}
    */
-  get page() {
+  get page(): Page {
     return this._page;
   }
 
   /**
    * Navigates to the specified URL, encapsulated within a reporting step.
-   * @param {string} url
-   * @returns {Promise<void>}
    */
-  async openUrl(url) {
+  async openUrl(url: string): Promise<void> {
     await test.step(`Browser — Open URL: "${url}"`, async () => {
       await this._page.goto(url);
     });
@@ -47,9 +50,8 @@ export default class Browser {
 
   /**
    * Retrieves the current URL of the active tab, encapsulated within a reporting step.
-   * @returns {Promise<string>}
    */
-  async getCurrentUrl() {
+  async getCurrentUrl(): Promise<string> {
     return await test.step('Browser — Get current URL', async () => {
       return this._page.url();
     });
@@ -57,9 +59,8 @@ export default class Browser {
 
   /**
    * Reloads the current page, encapsulated within a reporting step.
-   * @returns {Promise<void>}
    */
-  async refresh() {
+  async refresh(): Promise<void> {
     await test.step('Browser — Refresh page', async () => {
       await this._page.reload();
     });
@@ -67,9 +68,8 @@ export default class Browser {
 
   /**
    * Navigates to the previous page in history, encapsulated within a reporting step.
-   * @returns {Promise<void>}
    */
-  async navigateBack() {
+  async navigateBack(): Promise<void> {
     await test.step('Browser — Navigate back', async () => {
       await this._page.goBack();
     });
@@ -77,9 +77,8 @@ export default class Browser {
 
   /**
    * Navigates to the next page in history, encapsulated within a reporting step.
-   * @returns {Promise<void>}
    */
-  async navigateForward() {
+  async navigateForward(): Promise<void> {
     await test.step('Browser — Navigate forward', async () => {
       await this._page.goForward();
     });
@@ -87,12 +86,11 @@ export default class Browser {
 
   /**
    * Accepts an alert dialog triggered by the provided action, encapsulated within a reporting step.
-   * @param {Function} actionCallback - Action that triggers the alert
-   * @returns {Promise<void>}
+   * @param actionCallback - Action that triggers the alert
    */
-  async acceptAlert(actionCallback) {
+  async acceptAlert(actionCallback: () => Promise<void>): Promise<void> {
     await test.step('Browser — Accept alert dialog', async () => {
-      const listener = async (dialog) => await dialog.accept();
+      const listener = async (dialog: Dialog) => await dialog.accept();
       this._page.on('dialog', listener);
 
       try {
@@ -105,10 +103,9 @@ export default class Browser {
 
   /**
    * Opens a new tab and optionally navigates to a URL, encapsulated within a reporting step.
-   * @param {string} [url] - Optional URL to navigate to after opening the tab
-   * @returns {Promise<import('@playwright/test').Page>}
+   * @param url - Optional URL to navigate to after opening the tab
    */
-  async newTab(url) {
+  async newTab(url?: string): Promise<Page> {
     return await test.step(url ? `Browser — Open new tab and navigate to: "${url}"` : 'Browser — Open new tab', async () => {
       const newPage = await this._page.context().newPage();
 
@@ -130,10 +127,8 @@ export default class Browser {
 
   /**
    * Switches focus to the tab at the specified index, encapsulated within a reporting step.
-   * @param {number} index
-   * @returns {Promise<void>}
    */
-  async switchToTab(index) {
+  async switchToTab(index: number): Promise<void> {
     await test.step(`Browser — Switch to tab index [${index}]`, async () => {
       this._pages = this._pages.filter(p => !p.isClosed());
 
@@ -149,10 +144,9 @@ export default class Browser {
 
   /**
    * Clicks a link that opens a new tab and waits for it to load, encapsulated within a reporting step.
-   * @param {Function} clickCallback - Action that triggers the new tab
-   * @returns {Promise<import('@playwright/test').Page>}
+   * @param clickCallback - Action that triggers the new tab
    */
-  async openLinkInNewTab(clickCallback) {
+  async openLinkInNewTab(clickCallback: () => Promise<void>): Promise<Page> {
     return await test.step('Browser — Open link in new tab', async () => {
       const context = this._page.context();
       const [newPage] = await Promise.all([
@@ -170,10 +164,8 @@ export default class Browser {
 
   /**
    * Closes the tab at the specified index, encapsulated within a reporting step.
-   * @param {number} index
-   * @returns {Promise<void>}
    */
-  async closeTab(index) {
+  async closeTab(index: number): Promise<void> {
     await test.step(`Browser — Close tab index [${index}]`, async () => {
       if (index < 0 || index >= this._pages.length) {
         throw new Error(`Tab index ${index} is out of bounds. Open tabs: ${this._pages.length}`);
@@ -184,38 +176,17 @@ export default class Browser {
 
       this._pages = this._pages.filter(p => !p.isClosed());
       if (this._page?.isClosed()) {
-        this._page = this._pages.at(-1) ?? null;
+        this._page = this._pages.at(-1) ?? null as any;
       }
     });
   }
 
   /**
    * Returns the count of currently open tabs, encapsulated within a reporting step.
-   * @returns {Promise<number>}
    */
-  async getTabsCount() {
+  async getTabsCount(): Promise<number> {
     return await test.step('Browser — Get tabs count', async () => {
       return this._pages.filter(p => !p.isClosed()).length;
-    });
-  }
-
-  /**
-   * Waits for a download event triggered by the action and saves the file, encapsulated within a reporting step.
-   * @param {Function} action - Action that triggers the download
-   * @param {string} fileName - Name of the file to save
-   * @returns {Promise<string>}
-   */
-  async downloadAndSave(action, fileName) {
-    return await test.step(`Browser — Download and save file: "${fileName}"`, async () => {
-      const [download] = await Promise.all([
-        this._page.waitForEvent('download'),
-        action(),
-      ]);
-
-      const filePath = path.join(this._downloadDir, fileName);
-      await download.saveAs(filePath);
-
-      return filePath;
     });
   }
 }

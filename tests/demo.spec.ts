@@ -1,4 +1,3 @@
-// @ts-check
 import { test, expect } from '#framework/ui/fixtures/browser.fixture.js';
 import MainPage from './pages/MainPage.js';
 import LoginPage from './pages/LoginPage.js';

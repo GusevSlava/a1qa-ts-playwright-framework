@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices, PlaywrightTestConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 
 // Load .env early so all env vars are available for config and framework code.
@@ -24,7 +24,7 @@ const allProjects = [
   {
     name: 'local-headed',
     use: {
-      browserName: 'chromium',
+      browserName: 'chromium' as const,
       headless: false,
       viewport: null,
       launchOptions: {
@@ -34,7 +34,7 @@ const allProjects = [
   },
 ];
 
-export default defineConfig({
+const config: PlaywrightTestConfig = {
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: isCI,
@@ -57,4 +57,6 @@ export default defineConfig({
   },
 
   projects: targetBrowser === 'all' ? allProjects : allProjects.filter(p => p.name === targetBrowser),
-});
+};
+
+export default config;

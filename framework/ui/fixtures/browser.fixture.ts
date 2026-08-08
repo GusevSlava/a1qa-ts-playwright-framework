@@ -1,25 +1,19 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, TestFixture, TestInfo } from '@playwright/test';
 import Browser from '../browser/Browser.js';
 import fs from 'fs/promises';
 import path from 'path';
 import EnvProvider from '../../utils/EnvProvider.js';
 
-/**
- * @typedef {Object} CustomFixtures
- * @property {Browser} customBrowser
- */
-
-/**
- * @typedef {import('@playwright/test').TestType<import('@playwright/test').PlaywrightTestArgs & import('@playwright/test').PlaywrightTestOptions & CustomFixtures>} CustomTestType
- */
+interface CustomFixtures {
+  customBrowser: Browser;
+}
 
 /**
  * Base custom test fixture providing an isolated Browser wrapper instance.
  * Inherits native Playwright configuration (e.g., viewport, video, acceptDownloads).
- * @type {CustomTestType}
  */
-export const test = base.extend({
-  customBrowser: async ({ page, baseURL }, use, testInfo) => {
+export const test = base.extend<CustomFixtures>({
+  customBrowser: async ({ page, baseURL }, use, testInfo: TestInfo) => {
     const workerDownloadDir = path.join(testInfo.outputDir, 'downloads');
 
     await fs.mkdir(workerDownloadDir, { recursive: true });
@@ -39,11 +33,14 @@ export const test = base.extend({
   },
 });
 
+interface CustomFixturesWithAuth extends CustomFixtures {
+  httpCredentials: { username: string; password: string };
+}
+
 /**
  * Extended test fixture that pre-configures Basic Authentication for the context.
- * @type {CustomTestType}
  */
-export const testWithAuth = test.extend({
+export const testWithAuth = test.extend<CustomFixturesWithAuth>({
   httpCredentials: [
     async ({}, use) => {
       await use({
