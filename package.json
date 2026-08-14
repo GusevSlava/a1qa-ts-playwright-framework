@@ -12,6 +12,7 @@
   },
   "scripts": {
     "test": "playwright test",
+    "headed": "playwright test --headed",
     "lint": "eslint ."
   },
   "devDependencies": {

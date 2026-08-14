@@ -1,6 +1,16 @@
 import { test, Locator } from '@playwright/test';
 import Timeouts from '../constants/Timeouts.js';
 import ElementStateHandler from './helpers/elementState.js';
+import { ElementUtils } from './helpers/ElementUtils.js';
+
+interface BoundingRect {
+  top: number,
+  left: number,
+  right: number,
+  bottom: number,
+  width: number,
+  height: number,
+}
 
 export default class BaseElement {
   protected _locator: Locator;
@@ -72,6 +82,33 @@ export default class BaseElement {
       },
       { html, position }
       );
+    });
+  }
+
+  /**
+   * Executes a click by position action encapsulated within a reporting step.
+   * @param position - Position to click: 'left' | 'right' | 'top' | 'bottom'
+   */
+  async clickByPosition(position: 'left' | 'right' | 'top' | 'bottom' | 'center'): Promise<void> {
+    await test.step(`${this._type} '${this._name}' — Click by ${position} position`, async () => {
+      const offset = await ElementUtils.calculateOffset(this.locator, position);
+      await this.locator.click({ position: offset });
+    });
+  }
+
+  async getElementRect(): Promise<BoundingRect> {
+    return test.step(`${this._type} '${this._name}' — Get element bounding rectangle`, async () => {
+      return this.locator.evaluate(el => {
+        const r = el.getBoundingClientRect();
+        return {
+          top: r.top,
+          left: r.left,
+          right: r.right,
+          bottom: r.bottom,
+          width: r.width,
+          height: r.height,
+        };
+      });
     });
   }
 }

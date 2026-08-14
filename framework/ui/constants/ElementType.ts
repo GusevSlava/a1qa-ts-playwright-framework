@@ -5,6 +5,7 @@ interface IElementType {
   readonly LABEL: string;
   readonly TEXT_BOX: string;
   readonly FILE_INPUT: string;
+  readonly SLIDER: string;
 }
 
 const ElementType: IElementType = Object.freeze({
@@ -14,6 +15,7 @@ const ElementType: IElementType = Object.freeze({
   LABEL: 'Label',
   TEXT_BOX: 'Text Box',
   FILE_INPUT: 'File Input',
+  SLIDER: 'Slider',
 });
 
 export default ElementType;

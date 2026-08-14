@@ -3,6 +3,7 @@ import MainPage from './pages/MainPage.js';
 import LoginPage from './pages/LoginPage.js';
 import SecureAreaPage from './pages/SecureAreaPage.js';
 import AddRemovePage from './pages/AddRemovePage.js';
+import SliderPage from './pages/SliderPage';
 import ConfigReader from '#framework/utils/ConfigReader.js';
 import EnvProvider from '#framework/utils/EnvProvider.js';
 
@@ -30,7 +31,6 @@ test('demo test for a successful login', async ({ customBrowser: browser }) => {
 });
 
 test('test for add/remove elements', async ({ customBrowser: browser }) => {
-  const testData = ConfigReader.getTestData();
   const mainPage = new MainPage(browser.page);
   await mainPage.clickNavigationLink('Add/Remove Elements');
 
@@ -43,4 +43,39 @@ test('test for add/remove elements', async ({ customBrowser: browser }) => {
   expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(false);
   await addRemovePage.insertHtmlById('#elements', '<button class="added-manually" onclick="deleteElement()">Delete</button>');
   expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(true);
+});
+
+test.only('horizonal slider', async ({ customBrowser: browser }) => {
+  const mainPage = new MainPage(browser.page);
+  await mainPage.clickNavigationLink('Horizontal Slider');
+  const sliderPage = new SliderPage(browser.page);
+  await sliderPage.waitForPageToLoad();
+  await sliderPage.setInitialSliderValue('max');
+  let sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(5);
+  await sliderPage.setInitialSliderValue('middle');
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(2.5);
+  await sliderPage.setInitialSliderValue('min');
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(0);
+  await sliderPage.changeSliderValueByKeyboard('up');
+  await sliderPage.changeSliderValueByKeyboard('up');
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(1);
+  await sliderPage.changeSliderValueByKeyboard('down');
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(0.5);
+  await sliderPage.changeSliderValueByDragAndDrop(120);
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(5);
+  await sliderPage.changeSliderValueByDragAndDrop(0);
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(0);
+  await sliderPage.changeSliderValueByMouse(2);
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(2);
+  await sliderPage.changeSliderValueByMouse(-2);
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(0);
 });

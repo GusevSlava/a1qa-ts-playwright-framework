@@ -4,7 +4,7 @@ import { Page } from '@playwright/test';
 import Timeouts from '../../framework/ui/constants/Timeouts.js';
 import BaseElement from '#framework/ui/elements/BaseElement.js';
 
-export default class LoginPage extends BasePage {
+export default class AddRemovePage extends BasePage {
   private buttonByName(buttonName: string): Button;
   private elementById(id: string): BaseElement;
 
