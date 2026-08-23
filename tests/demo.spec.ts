@@ -3,7 +3,8 @@ import MainPage from './pages/MainPage.js';
 import LoginPage from './pages/LoginPage.js';
 import SecureAreaPage from './pages/SecureAreaPage.js';
 import AddRemovePage from './pages/AddRemovePage.js';
-import SliderPage from './pages/SliderPage';
+import SliderPage from './pages/SliderPage.js';
+import MultipleWindowsPage from './pages/MultipleWindowsPage.js';
 import ConfigReader from '#framework/utils/ConfigReader.js';
 import EnvProvider from '#framework/utils/EnvProvider.js';
 
@@ -45,7 +46,7 @@ test('test for add/remove elements', async ({ customBrowser: browser }) => {
   expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(true);
 });
 
-test.only('horizonal slider', async ({ customBrowser: browser }) => {
+test('horizonal slider', async ({ customBrowser: browser }) => {
   const mainPage = new MainPage(browser.page);
   await mainPage.clickNavigationLink('Horizontal Slider');
   const sliderPage = new SliderPage(browser.page);
@@ -78,4 +79,13 @@ test.only('horizonal slider', async ({ customBrowser: browser }) => {
   await sliderPage.changeSliderValueByMouse(-2);
   sliderValue = await sliderPage.getSliderValue();
   expect(sliderValue).toEqual(0);
+});
+
+test('Popup window', async ({ customBrowser: browser }) => {
+  const mainPage = new MainPage(browser.page);
+  await mainPage.clickNavigationLink('Multiple Windows');
+  const multipleWindowsPage = new MultipleWindowsPage(browser.page);
+  await multipleWindowsPage.waitForPageToLoad();
+  const popupText = await multipleWindowsPage.getPopupWindowText();
+  expect(popupText).toEqual('New Window');
 });

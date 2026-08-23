@@ -1,8 +1,6 @@
-import { Button, TextBox, Label, Locator, Slider } from '#framework/ui/elements/index.js';
+import { Label, Slider } from '#framework/ui/elements/index.js';
 import BasePage from '#framework/ui/page/BasePage.js';
 import { Page } from '@playwright/test';
-import Timeouts from '../../framework/ui/constants/Timeouts.js';
-import BaseElement from '#framework/ui/elements/BaseElement.js';
 
 export default class SliderPage extends BasePage {
   private slider: Slider;
