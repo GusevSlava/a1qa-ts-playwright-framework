@@ -44,7 +44,7 @@ const config: PlaywrightTestConfig = {
   reporter: [
     ['list'],
     ['html', { open: 'never' }],
-    ...(isCI ? [['junit', { outputFile: 'results.xml' }]] : [])
+    ...(isCI ? [['junit', { outputFile: 'results.xml' }] as const] : [])
   ],
 
   use: {
