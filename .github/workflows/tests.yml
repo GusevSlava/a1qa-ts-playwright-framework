@@ -24,6 +24,8 @@ jobs:
         env:
           TEST_USER: ${{ secrets.TEST_USER }}
           TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+          BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
+          BASIC_AUTH_PASSWORD: ${{ secrets.TEST_PASSWORD }}
 
       - uses: actions/upload-artifact@v4
         if: always()
