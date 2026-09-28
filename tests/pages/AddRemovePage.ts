@@ -1,12 +1,11 @@
-import { Button, TextBox, Label, Locator } from '#framework/ui/elements/index.js';
+import { Button, Label } from '#framework/ui/elements/index.js';
 import BasePage from '#framework/ui/page/BasePage.js';
 import { Page } from '@playwright/test';
-import Timeouts from '../../framework/ui/constants/Timeouts.js';
 import BaseElement from '#framework/ui/elements/BaseElement.js';
 
 export default class AddRemovePage extends BasePage {
-  private buttonByName(buttonName: string): Button;
-  private elementById(id: string): BaseElement;
+  private buttonByName: (buttonName: string) => Button;
+  private elementById: (id: string) => BaseElement;
 
   constructor(page: Page) {
     super(

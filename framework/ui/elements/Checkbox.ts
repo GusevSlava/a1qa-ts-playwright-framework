@@ -28,4 +28,13 @@ export class Checkbox extends BaseElement {
       await this.locator.uncheck();
     });
   }
+
+  /**
+   * Verify checkbox status.
+   */
+  async isChecked(): Promise<boolean> {
+    return test.step(`${this._type} '${this._name}' — Get checkbox status`, async () => {
+      return this.locator.isChecked();
+    });
+  }
 }

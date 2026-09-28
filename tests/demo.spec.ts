@@ -5,6 +5,7 @@ import SecureAreaPage from './pages/SecureAreaPage.js';
 import AddRemovePage from './pages/AddRemovePage.js';
 import SliderPage from './pages/SliderPage.js';
 import MultipleWindowsPage from './pages/MultipleWindowsPage.js';
+import CheckboxesPage from './pages/Checkboxes.js';
 import ConfigReader from '#framework/utils/ConfigReader.js';
 import EnvProvider from '#framework/utils/EnvProvider.js';
 
@@ -88,4 +89,18 @@ test('Popup window', async ({ customBrowser: browser }) => {
   await multipleWindowsPage.waitForPageToLoad();
   const popupText = await multipleWindowsPage.getPopupWindowText();
   expect(popupText).toEqual('New Window');
+});
+
+
+test('Checkboxes', async ({ customBrowser: browser }) => {
+  const mainPage = new MainPage(browser.page);
+  await mainPage.clickNavigationLink('Checkboxes');
+  const checkboxesPage = new CheckboxesPage(browser.page);
+  await checkboxesPage.waitForPageToLoad();
+  expect(await checkboxesPage.isCheckedByIndex(1)).toBe(false);
+  await checkboxesPage.checkByIndex(1);
+  expect(await checkboxesPage.isCheckedByIndex(1)).toBe(true);
+  expect(await checkboxesPage.isCheckedByIndex(2)).toBe(true);
+  await checkboxesPage.uncheckByIndex(2);
+  expect(await checkboxesPage.isCheckedByIndex(2)).toBe(false);
 });
