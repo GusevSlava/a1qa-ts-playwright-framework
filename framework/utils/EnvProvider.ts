@@ -13,7 +13,7 @@ export default class EnvProvider {
   private static _requireEnv(name: string): string {
     const value = process.env[name];
     if (!value) {
-      throw new Error(`CRITICAL: Environment variable "${name}" is missing! Please check your .env file.`);
+      throw new Error(`CRITICAL: Environment variable "${name}" is missing! Set it in the process environment or .env file.`);
     }
     return value;
   }
