@@ -64,6 +64,20 @@ If you forget to set this up or miss a variable, the framework's `EnvProvider` w
 
 ---
 
+## GitHub Actions Email Reports
+
+The workflow uploads the Playwright HTML report as an artifact and emails it as a ZIP attachment when SMTP is configured. Add these repository secrets under **Settings → Secrets and variables → Actions**:
+
+* `SMTP_SERVER` — SMTP server hostname (for Gmail, `smtp.gmail.com`).
+* `SMTP_PORT` — SMTP port, usually `465` or `587`.
+* `SMTP_USERNAME` — SMTP account username and sender address.
+* `SMTP_PASSWORD` — SMTP password or provider-specific app password.
+* `REPORT_EMAIL_TO` — recipient email address.
+
+The email step is skipped if any mail secret is missing or no HTML report was generated. GitHub does not expose repository secrets to workflows triggered by pull requests from forks.
+
+---
+
 ## 📜 Strict Page Object Rules
 
 This framework mandates a strict, classic approach to the Page Object pattern to ensure maximum stability and zero "flakiness". All contributors must adhere to the following rules:
