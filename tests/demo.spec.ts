@@ -31,3 +31,76 @@ test('demo test for a successful login', async ({ customBrowser: browser }) => {
   await loginPage.waitForPageToLoad();
   expect(await loginPage.isPageOpened()).toBe(true);
 });
+
+test('test for add/remove elements', async ({ customBrowser: browser }) => {
+  const mainPage = new MainPage(browser.page);
+  await mainPage.clickNavigationLink('Add/Remove Elements');
+
+  const addRemovePage = new AddRemovePage(browser.page);
+  await addRemovePage.waitForPageToLoad();
+  expect(await addRemovePage.isPageOpened()).toBe(true);
+  await addRemovePage.clickButton('Add Element');
+  expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(true);
+  await addRemovePage.clickButton('Delete');
+  expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(false);
+  await addRemovePage.insertHtmlById('#elements', '<button class="added-manually" onclick="deleteElement()">Delete</button>');
+  expect(await addRemovePage.isButtonDisplayed('Delete')).toBe(true);
+});
+
+test('horizonal slider', async ({ customBrowser: browser }) => {
+  const mainPage = new MainPage(browser.page);
+  await mainPage.clickNavigationLink('Horizontal Slider');
+  const sliderPage = new SliderPage(browser.page);
+  await sliderPage.waitForPageToLoad();
+  await sliderPage.setInitialSliderValue('max');
+  let sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(5);
+  await sliderPage.setInitialSliderValue('middle');
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(2.5);
+  await sliderPage.setInitialSliderValue('min');
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(0);
+  await sliderPage.changeSliderValueByKeyboard('up');
+  await sliderPage.changeSliderValueByKeyboard('up');
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(1);
+  await sliderPage.changeSliderValueByKeyboard('down');
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(0.5);
+  await sliderPage.changeSliderValueByDragAndDrop(120);
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(5);
+  await sliderPage.changeSliderValueByDragAndDrop(0);
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(0);
+  await sliderPage.changeSliderValueByMouse(2);
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(2);
+  await sliderPage.changeSliderValueByMouse(-2);
+  sliderValue = await sliderPage.getSliderValue();
+  expect(sliderValue).toEqual(0);
+});
+
+test('Popup window', async ({ customBrowser: browser }) => {
+  const mainPage = new MainPage(browser.page);
+  await mainPage.clickNavigationLink('Multiple Windows');
+  const multipleWindowsPage = new MultipleWindowsPage(browser.page);
+  await multipleWindowsPage.waitForPageToLoad();
+  const popupText = await multipleWindowsPage.getPopupWindowText();
+  expect(popupText).toEqual('New Window');
+});
+
+
+test('Checkboxes', async ({ customBrowser: browser }) => {
+  const mainPage = new MainPage(browser.page);
+  await mainPage.clickNavigationLink('Checkboxes');
+  const checkboxesPage = new CheckboxesPage(browser.page);
+  await checkboxesPage.waitForPageToLoad();
+  expect(await checkboxesPage.isCheckedByIndex(1)).toBe(false);
+  await checkboxesPage.checkByIndex(1);
+  expect(await checkboxesPage.isCheckedByIndex(1)).toBe(true);
+  expect(await checkboxesPage.isCheckedByIndex(2)).toBe(true);
+  await checkboxesPage.uncheckByIndex(2);
+  expect(await checkboxesPage.isCheckedByIndex(2)).toBe(false);
+});

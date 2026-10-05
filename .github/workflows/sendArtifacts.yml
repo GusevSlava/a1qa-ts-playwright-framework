@@ -2,20 +2,36 @@ name: Playwright send artifacts
 
 on:
   workflow_run:
-    workflows: test
+    workflows: Playwright
     types:
       - completed
 
+permissions:
+  actions: read
+
 jobs:
-  test:
+  send-report:
     runs-on: ubuntu-latest
-    uses: actions/download-artifact@v5
-    with:
-      name: Package Playwright report
-      path: playwright-report.zip
-      run-id: ${{ github.event.workflow_run.id }}
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
+      - name: Download Playwright report
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: playwright-report
+          path: playwright-report
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Package Playwright report
+        if: always()
+        run: |
+          if [ -d playwright-report ]; then
+            zip -qr playwright-report.zip playwright-report
+          else
+            echo "Playwright report artifact not found; skipping email attachment."
+          fi
+
       - name: Check email configuration
         id: email-config
         if: always()
