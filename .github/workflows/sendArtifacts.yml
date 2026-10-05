@@ -1,7 +1,7 @@
 name: Playwright send artifacts
 
 on:
-  workflow_run: Playwright
+  workflow_run: tests
     workflows:
     types:
       - completed
