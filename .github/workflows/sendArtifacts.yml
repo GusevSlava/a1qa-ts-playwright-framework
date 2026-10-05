@@ -1,7 +1,10 @@
 name: Playwright send artifacts
 
 on:
-  workflow_call:
+  workflow_run:
+    workflows: Playwright
+    types:
+      - completed
 
 permissions:
   actions: read
@@ -17,6 +20,8 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Package Playwright report
         if: always()

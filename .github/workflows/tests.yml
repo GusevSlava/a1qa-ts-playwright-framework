@@ -41,11 +41,3 @@ jobs:
           else
             echo "Playwright report directory not found; skipping email attachment."
           fi
-
-  send-report:
-    needs: test
-    if: always()
-    permissions:
-      actions: read
-    uses: ./.github/workflows/sendArtifacts.yml
-    secrets: inherit
