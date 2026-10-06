@@ -40,14 +40,14 @@ jobs:
           REPORT_EMAIL_TO: ${{ secrets.REPORT_EMAIL_TO }}
         run: |
           if [ -n "$RESEND_API_KEY" ] && [ -n "$REPORT_EMAIL_TO" ] && [ -f playwright-report.zip ]; then
-            export ATTACHMENT=$(base64 -w0 playwright-report.zip 2>/dev/null || base64 playwright-report.zip | tr -d '\n')
+            base64 -w0 playwright-report.zip > /tmp/playwright-report.zip.b64 2>/dev/null || base64 playwright-report.zip | tr -d '\n' > /tmp/playwright-report.zip.b64
 
-            JSON_PAYLOAD=$(REPORT_EMAIL_TO="$REPORT_EMAIL_TO" ATTACHMENT="$ATTACHMENT" python -c 'import json, os; payload = {"from": "onboarding@resend.dev", "to": [os.environ["REPORT_EMAIL_TO"]], "subject": "Playwright Report", "html": "<p>Playwright tests completed. The full report archive is attached.</p>", "attachments": [{"filename": "playwright-report.zip", "content": os.environ["ATTACHMENT"]}]}; print(json.dumps(payload))')
+            REPORT_EMAIL_TO="$REPORT_EMAIL_TO" python -c 'import json, os; from pathlib import Path; payload = {"from": "onboarding@resend.dev", "to": [os.environ["REPORT_EMAIL_TO"]], "subject": "Playwright Report", "html": "<p>Playwright tests completed. The full report archive is attached.</p>", "attachments": [{"filename": "playwright-report.zip", "content": Path("/tmp/playwright-report.zip.b64").read_text()}]}; Path("/tmp/resend_payload.json").write_text(json.dumps(payload))'
 
             curl -X POST "https://api.resend.com/emails" \
               -H "Authorization: Bearer $RESEND_API_KEY" \
               -H "Content-Type: application/json" \
-              --data "$JSON_PAYLOAD"
+              --data @/tmp/resend_payload.json
           else
             echo "Resend email skipped because required secrets or report archive are missing."
           fi
