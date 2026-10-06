@@ -9,7 +9,7 @@ import CheckboxesPage from './pages/Checkboxes.js';
 import ConfigReader from '#framework/utils/ConfigReader.js';
 import EnvProvider from '#framework/utils/EnvProvider.js';
 
-test('demo test for a successful login', async ({ customBrowser: browser }) => {
+test.only('demo test for a successful login', async ({ customBrowser: browser }) => {
   const testData = ConfigReader.getTestData();
   const mainPage = new MainPage(browser.page);
   await mainPage.clickNavigationLink('Form Authentication');

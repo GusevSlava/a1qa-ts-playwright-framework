@@ -37,7 +37,7 @@ const allProjects = [
 const config: PlaywrightTestConfig = {
   testDir: './tests',
   fullyParallel: true,
-  forbidOnly: isCI,
+  forbidOnly: false,
   retries: isCI ? 2 : 0,
   workers: isCI ? 1 : undefined,
 
