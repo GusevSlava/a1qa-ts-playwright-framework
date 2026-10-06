@@ -34,12 +34,3 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-
-      - name: Package Playwright report
-        if: always()
-        run: |
-          if [ -d playwright-report ]; then
-            zip -qr playwright-report.zip playwright-report
-          else
-            echo "Playwright report directory not found; skipping email attachment."
-          fi
