@@ -32,37 +32,48 @@ jobs:
           else
             echo "Playwright report artifact not found; skipping email attachment."
           fi
-
-      - name: Check email configuration
-        id: email-config
-        if: always()
-        env:
-          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          REPORT_EMAIL_TO: ${{ secrets.REPORT_EMAIL_TO }}
+        - name: Send email via Resend
         run: |
-          if [ -n "$SMTP_SERVER" ] && [ -n "$SMTP_PORT" ] && [ -n "$SMTP_USERNAME" ] && [ -n "$SMTP_PASSWORD" ] && [ -n "$REPORT_EMAIL_TO" ]; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "Email report skipped because one or more SMTP secrets are missing."
-          fi
+          curl -X POST "https://api.resend.com/emails" \
+          -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "from":"onboarding@resend.dev",
+            "to":${{ secrets.REPORT_EMAIL_TO }},
+            "subject":"Playwright Report",
+            "html":"<p>Tests completed successfully</p>"
+          }'
 
-      - name: Email Playwright report
-        if: always() && steps.email-config.outputs.enabled == 'true' && hashFiles('playwright-report.zip') != ''
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "Playwright report: ${{ job.status }}"
-          to: ${{ secrets.REPORT_EMAIL_TO }}
-          from: ${{ secrets.SMTP_USERNAME }}
-          body: |
-            Playwright test run completed with status: ${{ job.status }}
-            Run details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            The complete HTML report is attached as a ZIP archive.
-          attachments: playwright-report.zip
+      # - name: Check email configuration
+      #   id: email-config
+      #   if: always()
+      #   env:
+      #     SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+      #     SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      #     SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+      #     SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      #     REPORT_EMAIL_TO: ${{ secrets.REPORT_EMAIL_TO }}
+      #   run: |
+      #     if [ -n "$SMTP_SERVER" ] && [ -n "$SMTP_PORT" ] && [ -n "$SMTP_USERNAME" ] && [ -n "$SMTP_PASSWORD" ] && [ -n "$REPORT_EMAIL_TO" ]; then
+      #       echo "enabled=true" >> "$GITHUB_OUTPUT"
+      #     else
+      #       echo "enabled=false" >> "$GITHUB_OUTPUT"
+      #       echo "Email report skipped because one or more SMTP secrets are missing."
+      #     fi
+
+      # - name: Email Playwright report
+      #   if: always() && steps.email-config.outputs.enabled == 'true' && hashFiles('playwright-report.zip') != ''
+      #   uses: dawidd6/action-send-mail@v3
+      #   with:
+      #     server_address: ${{ secrets.SMTP_SERVER }}
+      #     server_port: ${{ secrets.SMTP_PORT }}
+      #     username: ${{ secrets.SMTP_USERNAME }}
+      #     password: ${{ secrets.SMTP_PASSWORD }}
+      #     subject: "Playwright report: ${{ job.status }}"
+      #     to: ${{ secrets.REPORT_EMAIL_TO }}
+      #     from: ${{ secrets.SMTP_USERNAME }}
+      #     body: |
+      #       Playwright test run completed with status: ${{ job.status }}
+      #       Run details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      #       The complete HTML report is attached as a ZIP archive.
+      #     attachments: playwright-report.zip
