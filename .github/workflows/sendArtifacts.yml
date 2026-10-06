@@ -32,17 +32,26 @@ jobs:
           else
             echo "Playwright report artifact not found; skipping email attachment."
           fi
-        - name: Send email via Resend
+
+      - name: Send email via Resend
+        if: always()
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          REPORT_EMAIL_TO: ${{ secrets.REPORT_EMAIL_TO }}
         run: |
-          curl -X POST "https://api.resend.com/emails" \
-          -H "Authorization: Bearer ${{ secrets.RESEND_API_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "from":"onboarding@resend.dev",
-            "to":${{ secrets.REPORT_EMAIL_TO }},
-            "subject":"Playwright Report",
-            "html":"<p>Tests completed successfully</p>"
-          }'
+          if [ -n "$RESEND_API_KEY" ] && [ -n "$REPORT_EMAIL_TO" ] && [ -f playwright-report.zip ]; then
+            curl -X POST "https://api.resend.com/emails" \
+              -H "Authorization: Bearer $RESEND_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"from\": \"onboarding@resend.dev\",
+                \"to\": [\"$REPORT_EMAIL_TO\"],
+                \"subject\": \"Playwright Report\",
+                \"html\": \"<p>Tests completed successfully</p>\"
+              }"
+          else
+            echo "Resend email skipped because required secrets or report archive are missing."
+          fi
 
       # - name: Check email configuration
       #   id: email-config
